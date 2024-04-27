@@ -14,7 +14,7 @@ export default function Categories({email,handleModal,logstate}) {
         const response = await axios.get('https://res-server-sigma.vercel.app/api/category/allcategories')
         const categorydata = response.data;
         setCategories(categorydata);
-        console.log("categories",categorydata)
+        // console.log("categories",categorydata)
     }
     useEffect(()=>{
         getCategories()
