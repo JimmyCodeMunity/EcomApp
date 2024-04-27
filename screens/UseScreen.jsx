@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import FeatherIcon from "react-native-vector-icons/Feather";
+
+
 
 const UseScreen = ({ navigation }) => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -12,7 +15,7 @@ const UseScreen = ({ navigation }) => {
     },
     {
       id: 2,
-      title: 'Search for your desired manufacturer.',
+      title: 'Search for your desired supplier.',
       description: 'You can search for either the product or supplier.',
       image: require('../assets/use/search.png'),
     },
@@ -48,7 +51,10 @@ const UseScreen = ({ navigation }) => {
   };
 
   return (
-    <View className="flex-1 justify-center items-center" style={{ backgroundColor:'orange' }}>
+    <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'orange' }}>
+      <TouchableOpacity onPress={() => navigation.goBack()} className="absolute space-y-10 space-x-10" style={{top:40,left:30}}>
+        <FeatherIcon name="x" size={40} color="white" />
+      </TouchableOpacity>
       <Image source={slides[activeSlide].image} style={styles.slideImage} />
       <Text className="text-3xl text-white font-bold my-5">{slides[activeSlide].title}</Text>
       <Text className="text-lg text-white font-semibold">{slides[activeSlide].description}</Text>
@@ -93,11 +99,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 5,
-    width:'70%',
-    alignItems:'center',
-    borderRadius:15,
-    marginTop:'10%',
-    height:45,
+    width: '70%',
+    alignItems: 'center',
+    borderRadius: 15,
+    marginTop: '10%',
+    height: 45,
   },
   nextButtonText: {
     color: 'black',

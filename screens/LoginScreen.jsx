@@ -64,9 +64,9 @@ const LoginScreen = () => {
   };
 
 
-  
 
-  
+
+
 
   // const handleLogin = () => {
 
@@ -93,7 +93,7 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('https://opasso-app-backend.vercel.app/api/user/login', {
+      const response = await axios.post('https://res-server-sigma.vercel.app/api/user/login', {
         email,
         password,
       });
@@ -105,9 +105,9 @@ const LoginScreen = () => {
         await AsyncStorage.setItem("password", password);
         await AsyncStorage.setItem("loginStatus", "LoggedIn");
 
-        console.log(response.data.message);
+        // console.log(response.data.message);
         handleSuccess(); // Navigate to the next screen
-        
+
       }
     } catch (error) {
       setLoading(false);
@@ -149,8 +149,8 @@ const LoginScreen = () => {
     try {
       const savedEmail = await AsyncStorage.getItem("email");
       const savedPassword = await AsyncStorage.getItem("password");
-      const savedStatus= await AsyncStorage.getItem("loginStatus");
-      console.log("new state:",savedStatus);
+      const savedStatus = await AsyncStorage.getItem("loginStatus");
+      // console.log("new state:", savedStatus);
 
 
       if (savedEmail && savedPassword) {
@@ -172,17 +172,17 @@ const LoginScreen = () => {
   };
 
   const handleNoAccount = () => {
-    console.log("Status now:",loginState)
+    // console.log("Status now:", loginState)
     navigation.navigate("First");
   };
 
   const handleSuccess = async () => {
     try {
       // Save login status and email in AsyncStorage
-      
-  
+
+
       // Navigate to the next screen
-      navigation.navigate("Home");
+      navigation.replace("Home");
     } catch (error) {
       console.log("Error saving login status:", error);
     } finally {
@@ -190,7 +190,7 @@ const LoginScreen = () => {
     }
   };
 
-  console.log(loginState);
+  // console.log(loginState);
 
 
   useEffect(() => {
@@ -205,69 +205,69 @@ const LoginScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light"/>
-      
-        <View className="bg-white w-full rounded-b-[30] justify-center items-center absolute flex-1" style={{ height:windowHeight*0.7 }}>
-          <View style={styles.logo}>
-            <Image
-              source={require("../assets/logo.jpg")}
-              style={styles.profileImage}
-            />
-            <Text style={styles.logotext}>ResellerSprint</Text>
-          </View>
+      <StatusBar style="light" />
 
-          <View className="bg-orange w-80 rounded-3xl px-5 justify-center items-center p-5" style={{ backgroundColor:'orange',height:windowHeight*0.4 }}>
-            <Text className="font-semibold text-2xl text-white my-5">
-              Login
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter email"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-            />
+      <View className="bg-white w-full rounded-b-[30] justify-center items-center absolute flex-1" style={{ height: windowHeight * 0.7 }}>
+        <View style={styles.logo}>
+          <Image
+            source={require("../assets/rsp.png")}
+            style={styles.profileImage}
+          />
+          <Text style={styles.logotext}>ResellerSprint</Text>
+        </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              secureTextEntry
-            />
+        <View className="bg-orange w-80 rounded-3xl px-5 justify-center items-center p-5" style={{ backgroundColor: 'orange', height: windowHeight * 0.4 }}>
+          <Text className="font-semibold text-2xl text-white my-5">
+            Login
+          </Text>
+          <TextInput
+            className="w-60 px-5 rounded-2xl h-10 bg-white mb-4"
+            placeholder="Enter email"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
 
-
-            <View style={styles.btncontainer}>
-              <TouchableOpacity onPress={handleLogin} className="justify-center items-center bg-white rounded-2xl w-40 h-12">
-                {loading ? (
-                  <ActivityIndicator size="small" color="black" />
-                ) : (
-                  <Text className="text-lg font-bold text-orange-500">Login</Text>
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={handleForgot}>
-                <Text className="font-bold text-white mt-4 text-md">
-                  Forgot Password
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={handleRegister}>
-                <Text className="font-bold text-white mt-4 text-md">
-                  Create Account?
-                </Text>
-              </TouchableOpacity>
+          <TextInput
+            className="w-60 px-5 rounded-2xl h-10 bg-white"
+            placeholder="Password"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry
+          />
 
 
-              <TouchableOpacity onPress={handleNoAccount}>
-                <Text className="font-bold text-white mt-4 text-md">
-                  Continue without Login
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.btncontainer}>
+            <TouchableOpacity onPress={handleLogin} className="justify-center items-center bg-white rounded-2xl w-40 h-12">
+              {loading ? (
+                <ActivityIndicator size="small" color="black" />
+              ) : (
+                <Text className="text-lg font-bold text-orange-500">Login</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleForgot}>
+              <Text className="font-bold text-white mt-4 text-md">
+                Forgot Password
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleRegister}>
+              <Text className="font-bold text-white mt-4 text-md">
+                Create Account?
+              </Text>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity onPress={handleNoAccount}>
+              <Text className="font-bold text-white mt-4 text-md">
+                Continue without Login
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-      
-        
+      </View>
+
+
     </SafeAreaView>
   );
 };
@@ -282,14 +282,14 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
   },
-  
+
   logotext: {
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 27,
     paddingVertical: 12,
   },
-  
+
   input: {
     backgroundColor: "white",
     width: "80%",

@@ -8,12 +8,15 @@ import {
   Image,
   TextInput,
   RefreshControl,
+  ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useCurrency } from "../components/CurrencyProvider";
 import Loading from "../components/Loading";
 import Animated, { SlideInDown, SlideInLeft } from "react-native-reanimated";
+import * as Icon from "react-native-feather";
+
 
 const ManufacturerScreen = ({ navigation, route }) => {
   const [manufacturer, setManufacturer] = useState([]);
@@ -31,7 +34,7 @@ const ManufacturerScreen = ({ navigation, route }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://opasso-app-backend.vercel.app/api/shop/sellers`
+        `https://res-server-sigma.vercel.app/api/shop/sellers`
       );
       setManufacturer(response.data);
       setLoading(false);
@@ -54,19 +57,34 @@ const ManufacturerScreen = ({ navigation, route }) => {
 
   //filter
   const filteredManufacturers = manufacturer.filter((manufacturer) =>
-    manufacturer.name.toLowerCase().includes(searchQuery.toLowerCase())
+    manufacturer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.dollarExchangeRate.toFixed().includes(searchQuery.toLowerCase())
+
   );
   return (
     <SafeAreaView className="flex-1 bg-white">
+      
       <SafeAreaView className="justify-center items-center mt-8">
+      <View className="flex-row justify-between px-4 w-full items-center">
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        className="bg-orange-200 p-2 w-12 h-12 rounded-full shadow border border-slate-200 border-b-xl"
+      >
+        <Icon.ArrowLeft strokeWidth={3} stroke="orange" />
+      </TouchableOpacity>
+      
         <Text className="text-orange-500 font-bold text-2xl">
-          All Wholesalers
+          All Suppliers
         </Text>
+        </View>
       </SafeAreaView>
       <View className="p-5 justify-center items-center">
         <TextInput
           className="h-12 w-full border border-slate-300 px-5 rounded-2xl"
-          placeholder="Search by name"
+          placeholder="Search by name,ex.rate,company,country.."
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
         />
@@ -78,16 +96,20 @@ const ManufacturerScreen = ({ navigation, route }) => {
         }
       >
         {loading ? (
-          <Loading />
+          <View className="flex-1 justify-center items-center">
+              <ActivityIndicator size="large" color="gray" />
+            </View>
         ) : (
-          <Animated.View entering={SlideInLeft.delay(400).springify()}
-           className="flex-1 px-5">
+          <Animated.View
+            entering={SlideInLeft.delay(400).springify()}
+            className="flex-1 px-5"
+          >
             {filteredManufacturers.map((manufacturer) => {
               return (
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("manufacturers", {
-                      manName: manufacturer.name,
+                      manName: manufacturer.firstName,
                       mancat1: manufacturer.category,
                       manEmail: manufacturer.email,
                       manAddress: manufacturer.address,
@@ -114,11 +136,11 @@ const ManufacturerScreen = ({ navigation, route }) => {
                       </View>
                       <View className="justify-start" style={{ width: "50%" }}>
                         <Text className="text-neutral-600 mt-3 font-bold">
-                          {manufacturer.name.length > 12
-                            ? manufacturer.name.slice(0, 12) + "..."
-                            : manufacturer.name}
+                          {manufacturer.firstName.length > 12
+                            ? manufacturer.firstName.slice(0, 12) + "..."
+                            : manufacturer.firstName}
                         </Text>
-                        <Text>Exchange Rate:{manufacturer.exchangeRate}</Text>
+                        <Text>Exchange Rate:{manufacturer.dollarExchangeRate}</Text>
                       </View>
                     </View>
                   </View>

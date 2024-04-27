@@ -37,7 +37,7 @@ export const getAds = async () => {
 
 export const getUserdata = ({email,userdata,setUserdata,setLoading,userEmail}) => {
     setLoading(true);
-    fetch("https://opasso-app-backend.vercel.app/api/user/usersdata")
+    fetch("https://res-server-sigma.vercel.app/api/user/usersdata")
         .then((response) => response.json())
         .then((data) => {
             setLoading(false);
@@ -53,7 +53,7 @@ export const getUserdata = ({email,userdata,setUserdata,setLoading,userEmail}) =
 
 
 export const getUserdataAndUpdate = ({setUserdata,setLoading,userEmail,session}) => {
-    fetch("https://opasso-app-backend.vercel.app/api/user/usersdata")
+    fetch("https://res-server-sigma.vercel.app/api/user/usersdata")
         .then((response) => response.json())
         .then((data) => {
             setLoading(false);

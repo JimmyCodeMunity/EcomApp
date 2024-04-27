@@ -23,7 +23,7 @@ const Deals = () => {
             try {
                 const eventData = await getEvents();
                 setEvents(eventData);
-                console.log('Deals:', dealsData.length);
+                // console.log('Deals:', dealsData.length);
             } catch (error) {
                 console.error('Error fetching events:', error);
             }
@@ -49,10 +49,11 @@ const Deals = () => {
                 <TouchableWithoutFeedback onPress={()=>navigation.navigate('webdeals',{link:item.link})} className="">
                 
                 <Image
-                    className="rounded-3xl shadow-lg shadow-gray-900"
+                    className="rounded-2xl shadow-lg shadow-gray-900 object-cover"
                     style={{
                         width: windowWidth * 0.9,
-                        height: windowHeight * 0.3,
+                        height: windowHeight * 0.25,
+                        objectFit:'cover'
                     }}
                     source={{ uri: item.imageUri }}
                 />
@@ -79,8 +80,7 @@ const Deals = () => {
                     loop={true}
                     autoplay={true}
                     autoplayInterval={3000}
-                    layout={'stack'}
-                    layoutCardOffset={`18`}
+                    layout={'default'}
                 />
                 
             </View>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView ,TouchableOpacity} from "react-native";
 import LottieView from "lottie-react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from 'axios'
 import { firebaseConfig } from "./firebaseConfig";
 
@@ -73,12 +72,14 @@ const RegisterScreen = () => {
         address,
         phoneNumber,
       });
+      setLoading(false)
 
       // Assuming your API returns a message for successful registration
       if (response.status === 200) {
         console.log(response.data.message);
         Alert.alert("Account created successfully") // Navigate to the next screen
         handleLogin()
+        
       }
     } catch (error) {
       setLoading(false);
@@ -132,40 +133,21 @@ const RegisterScreen = () => {
       <View style={styles.logocontainer}>
         <View style={styles.logo}>
           <Image
-            source={require("../assets/logo.jpg")}
+            source={require("../assets/rsp.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.logotext}>Cloud CBD</Text>
+          <Text style={styles.logotext}>ResellerSprint</Text>
         </View>
 
-        <View style={styles.form}>
-          <Text style={{ color: 'orange', fontSize: 30, marginBottom: 20 }}>Register</Text>
+        <KeyboardAvoidingView behavior="padding" style={styles.form}>
+          <Text style={{ color: 'orange', fontSize: 30, marginBottom: 20 }} className="my-5">Register</Text>
 
           <TextInput
             style={styles.input}
             className="border border-sm border-slate-300 focus:border-orange-300"
-            placeholder="Enter Username"
+            placeholder="Enter Business Name"
             value={name}
             onChangeText={(text) => setName(text)}
-          />
-
-          <TextInput
-            style={styles.input}
-            className="border border-sm border-slate-300 focus:border-orange-300"
-            placeholder="Enter email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-
-
-
-          <TextInput
-            style={styles.input}
-            className="border border-sm border-slate-300 focus:border-orange-300"
-            placeholder="Password"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
           />
 
           <TextInput
@@ -180,10 +162,32 @@ const RegisterScreen = () => {
           <TextInput
             style={styles.input}
             className="border border-sm border-slate-300 focus:border-orange-300"
-            placeholder="Enter address"
+            placeholder="Enter email address"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+
+
+          <TextInput
+            style={styles.input}
+            className="border border-sm border-slate-300 focus:border-orange-300"
+            placeholder="Enter Location"
             value={address}
             onChangeText={(text) => setAddress(text)}
           />
+
+          <TextInput
+            style={styles.input}
+            className="border border-sm border-slate-300 focus:border-orange-300"
+            placeholder="Password"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry
+          />
+
+          
+
+          
 
           <View style={styles.btncontainer}>
             
@@ -202,7 +206,7 @@ const RegisterScreen = () => {
               <Text style={{ color: 'orange', fontSize: 15, marginTop: 12, }}>Already have account?Login</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
 
     </SafeAreaView>

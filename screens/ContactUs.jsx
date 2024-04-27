@@ -93,7 +93,7 @@ const ContactUs = ({ navigation, route }) => {
                     <View className="flex-row flex-wrap justify-between items-center py-4 px-5">
                         {reason.map((item) => {
                             return (
-                                <View className="bg-slate-400 p-2 justify-center items-center rounded-3xl">
+                                <View className="bg-slate-400 p-2 justify-center items-center rounded-3xl" key={item.id}>
                                     <TouchableOpacity key={item.id} className="rounded-2xl" onPress={() => setSubject(item.name)}>
                                         <Text className="text-slate-200 text-xl">{item.name}</Text>
                                     </TouchableOpacity>

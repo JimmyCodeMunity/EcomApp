@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView,TouchableOpacity } from "react-native";
 import LottieView from "lottie-react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from 'axios'
 import { firebaseConfig } from "./firebaseConfig";
 
@@ -110,7 +109,7 @@ const ForgotPassword = ({ navigation, route }) => {
             source={require("../assets/logo.jpg")}
             style={styles.profileImage}
           />
-          <Text style={styles.logotext}>Cloud CBD</Text>
+          <Text style={styles.logotext}>ResellerSprint</Text>
 
         </View>
 

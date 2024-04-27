@@ -43,6 +43,11 @@ import PdfScreen from '../screens/PdfScreen';
 import PdfScreenCat from '../screens/PdfScreen';
 import PdfManufac from '../screens/PdfManufac';
 import PdfAllProducts from '../screens/PdfAllProducts';
+import EventData from '../screens/EventData';
+import PrivacyPolicy from '../screens/PrivacyPolicyScreen';
+import LogoutConfirm from '../screens/LogoutConfirm';
+import OurStory from '../screens/OurStoryScreen';
+import ViewProduct from '../screens/ViewProduct';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -72,19 +77,24 @@ const Navigation = () => {
             <Stack.Screen name='manufacturers' component={ManufactureView} options={{ headerShown: true, title: '', presentation: 'modal' }} />
             <Stack.Screen name='passreset' component={ResetPassword} options={{ headerShown: false, presentation: 'modal' }} />
             <Stack.Screen name='empty' component={EmptyScreen} options={{ headerShown: false, presentation: 'modal' }} />
-            <Stack.Screen name='allmanufacturers' component={ManufacturerScreen} options={{ headerShown: true, title: 'WholeSalers', presentation: 'modal' }} />
+            <Stack.Screen name='allmanufacturers' component={ManufacturerScreen} options={{ headerShown: false, title: 'Suppliers', presentation: 'fullScreenModal' }} />
             <Stack.Screen name='webdeals' component={DealsWeb} options={{ headerShown: true, title: 'View Deals', presentation: 'modal' }} />
             <Stack.Screen name='editProfile' component={EditProfile} options={{ headerShown: true, title: 'Edit Profile', presentation: 'modal' }} />
             <Stack.Screen name='Profile' component={ProfileScreen} options={{ headerShown: true, title: 'Profile', presentation: 'modal' }} />
             <Stack.Screen name='Use' component={UseScreen} options={{ headerShown: false, title: 'Use', presentation: 'modal' }} />
             <Stack.Screen name='Contact' component={ContactUs} options={{ headerShown: true, title: 'Contact Us', presentation:'modal' }} />
             <Stack.Screen name='Faq' component={FaqScreen} options={{ headerShown: true, title: 'FAQ', presentation:'modal' }} />
-            <Stack.Screen name='About' component={AboutScreen} options={{ headerShown: true, title: 'FAQ', presentation:'modal' }} />
+            <Stack.Screen name='Policy' component={PrivacyPolicy} options={{ headerShown: true, title: 'Privacy Policy', presentation:'modal' }} />
+            <Stack.Screen name='About' component={AboutScreen} options={{ headerShown: true, title: 'About', presentation:'modal' }} />
+            <Stack.Screen name='Story' component={OurStory} options={{ headerShown: true, title: 'Our Story', presentation:'modal' }} />
             <Stack.Screen name='allproducts' component={ProductsScreen} options={{ headerShown: true, title: 'All Products' }} />
             <Stack.Screen name='ourwork' component={OurWork} options={{ headerShown: true, title: 'What we Do.',presentation:'modal' }} />
             <Stack.Screen name='pdfdownloadcategory' component={PdfScreenCat} options={{ headerShown: true, title: 'Download Category pdf',presentation:'modal' }} />
             <Stack.Screen name='pdfdownloadmanufacturer' component={PdfManufac} options={{ headerShown: true, title: 'Download Manufacturer pdf',presentation:'modal' }} />
             <Stack.Screen name='pdfdownloadall' component={PdfAllProducts} options={{ headerShown: true, title: 'Download All pdf',presentation:'modal' }} />
+            <Stack.Screen name='eventdata' component={EventData} options={{ headerShown: false, title: 'Event Data',presentation:'fullScreenModal' }} />
+            <Stack.Screen name='logoutconfirm' component={LogoutConfirm} options={{ headerShown: false,presentation:'modal' }} />
+            <Stack.Screen name='viewproduct' component={ViewProduct} options={{ headerShown: false,presentation:'modal' }} />
           </Stack.Navigator>
         </CurrencyProvider>
       </NavigationContainer>

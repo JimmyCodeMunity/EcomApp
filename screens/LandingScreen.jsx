@@ -14,6 +14,8 @@ import {
   StatusBar,
   ActivityIndicator,
   RefreshControl,
+  Platform,
+  BackHandler
 } from "react-native";
 import { Card } from "react-native-paper";
 import AntIcon from "react-native-vector-icons/AntDesign";
@@ -56,6 +58,11 @@ const LandingScreen = ({ navigation, route }) => {
   const [userdata, setUserdata] = useState([]);
   const [savedStatus, setSavedStatus] = useState("");
   const [email, setEmail] = useState('');
+
+
+
+  //prevent back
+
 
   //get email
 
@@ -122,9 +129,10 @@ const LandingScreen = ({ navigation, route }) => {
 
   const fetchManufacturer = async () => {
     try {
-      const response = await axios.get(`https://opasso-app-backend.vercel.app/api/shop/sellers`);
+      const response = await axios.get(`https://res-server-sigma.vercel.app/api/shop/sellers`);
       setManufacturer(response.data);
       setLoading(false);
+      // console.log(response.data)
 
     } catch (error) {
       console.log(error);
@@ -193,41 +201,10 @@ const LandingScreen = ({ navigation, route }) => {
   };
 
 
+  const handleLogout = () => {
+    navigation.navigate('logoutconfirm');
 
-
-
-
-
-
-
-
-  //logout function start
-  const logout = async () => {
-    // Perform any necessary logout actions (e.g., clear user session, reset state)
-
-    // Remove user token or session data from AsyncStorage
-    try {
-      await AsyncStorage.removeItem("userToken"); // Replace 'userToken' with your specific token or session key
-
-      // Set the login status to "LoggedOut" or any other value
-      await AsyncStorage.setItem("loginStatus", "LoggedOut");
-      await AsyncStorage.setItem("email", "");
-
-
-
-      //check status
-      const userStatus = await AsyncStorage.getItem("loginStatus");
-      console.log(userStatus);
-
-
-      // Navigate to the login or authentication screen
-      // Example using react-navigation:
-      navigation.navigate("Login")
-      setLogoutConfirm(false)
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }
 
 
 
@@ -269,7 +246,7 @@ const LandingScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView
       className="bg-white align-center flex-1"
-      style={styles.container}
+
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
@@ -278,7 +255,7 @@ const LandingScreen = ({ navigation, route }) => {
       {loading ? (
         <View className="flex-1 justify-center items-center h-full w-full">
           <LottieView
-            className="justify-center items-center" style={{ width: '40%',height:'40%' }}
+            className="justify-center items-center" style={{ width: '40%', height: '40%' }}
             source={require("../assets/spinner.json")}
             autoPlay
             loop={true}
@@ -289,225 +266,205 @@ const LandingScreen = ({ navigation, route }) => {
           <Text className="font-semibold text-xl tracking-wide">Loading products...</Text>
         </View>
       ) : (
-        <View className="flex-1">
+        <View className="flex-1" style={{ marginTop: Platform.OS === 'ios' ? '5%' : '10%' }}>
 
 
-        <SafeAreaView style={styles.top}>
-          <View style={styles.menu}>
-            <View>
-              <TouchableOpacity onPress={() => setBottomSheetVisible(true)}>
-                <FeatherIcon name="menu" size={25} color="orange" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-
-
-              <TouchableOpacity
-                style={{ marginRight: 10 }}
-                onPress={() => setLogoutConfirm(true)}
-              >
-                <FeatherIcon name="log-in" size={25} color="orange" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View className="py-5 px-4">
-            <View className="flex-row">
+          <SafeAreaView style={styles.top}>
+            <View style={styles.menu}>
               <View>
-                <Text className="text-slate-800 text-2xl font-semibold">Welcome back,{email === null ? "user" : userdata.name}</Text>
+                <TouchableOpacity onPress={() => setBottomSheetVisible(true)} className="space-x-10">
+                  <FeatherIcon name="menu" size={35} color="orange" />
+                </TouchableOpacity>
               </View>
-              <View>
 
+              <View style={{ flexDirection: "row" }}>
+
+
+                <TouchableOpacity
+                  style={{ marginRight: 10 }}
+                  onPress={handleLogout}
+
+                >
+                  <FeatherIcon name="log-in" size={35} color="orange" />
+                </TouchableOpacity>
               </View>
             </View>
-          </View>
 
+            <View className="py-5 px-4">
+              <View className="flex-row">
+                <View>
+                  <Text className="text-slate-800 text-2xl font-semibold">Welcome back,{email === null ? "user" : userdata.firstName}</Text>
+                </View>
+                <View>
 
-        </SafeAreaView>
-
-        {/**categories */}
-        <ScrollView
-          vertical={true}
-          style={styles.container1}
-          refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-          }
-        >
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-
-
-            <Deals />
-
-
-
-            <View>
-              <Text
-                style={{
-                  position: "absolute",
-                  color: "#ffffff",
-                  fontSize: 25,
-                  fontWeight: "bold",
-                  right: "70%",
-                  bottom: "60%",
-                }}
-              >
-                Searching
-              </Text>
-              <Text
-                style={{
-                  position: "absolute",
-                  color: "#ffffff",
-                  fontSize: 25,
-                  fontWeight: "bold",
-                  right: "60%",
-                  bottom: "40%",
-                }}
-              >
-                for a product?
-              </Text>
+                </View>
+              </View>
             </View>
-          </View>
 
 
-          <View
-            style={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
+          </SafeAreaView>
+
+          {/**categories */}
+          <ScrollView
+            vertical={true}
+            style={styles.container1}
+            refreshControl={
+              <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+            }
           >
-            <View>
-              <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'orange' }}>
-                <FeatherIcon name="star" size={25} color="orange" />Featured WholeSalers
-              </Text>
-            </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
 
-            <View>
-              <TouchableOpacity onPress={() => navigation.navigate('allmanufacturers')}>
-                <Text className="text-orange-500 font-semibold">View all</Text>
-              </TouchableOpacity>
 
-            </View>
-          </View>
+              <Deals />
 
 
 
-
-
-
-          <View>
-
-            {loading ? (
-              <View className="justify-center items-center flex-1 bg-transparent w-full">
-                <LottieView
-                  className="h-32 w-32"
-                  source={require("../assets/manufac.json")}
-                  autoPlay
-                  loop={true}
-                  onAnimationFinish={() => {
-                    // console.log("Animation finished");
+              <View>
+                <Text
+                  style={{
+                    position: "absolute",
+                    color: "#ffffff",
+                    fontSize: 25,
+                    fontWeight: "bold",
+                    right: "70%",
+                    bottom: "60%",
                   }}
-                />
+                >
+                  Searching
+                </Text>
+                <Text
+                  style={{
+                    position: "absolute",
+                    color: "#ffffff",
+                    fontSize: 25,
+                    fontWeight: "bold",
+                    right: "60%",
+                    bottom: "40%",
+                  }}
+                >
+                  for a product?
+                </Text>
               </View>
-            ) : (
-              <ScrollView
-                contentContainerStyle={{ paddingHorizontal: 15 }}
-                refreshControl={
-                  <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-                }
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-              >
-                <Animated.View entering={FadeInLeft.delay(200).springify()} style={styles.cardContainer} horizontal={true}>
-                  {manufacturer.slice(0, 4).map((manufacturer) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate("manufacturers", {
-                          manName: manufacturer.name,
-                          mancat1: manufacturer.category,
-                          manEmail: manufacturer.email,
-                          manAddress: manufacturer.address,
-                          manPhone: manufacturer.phoneNumber,
-                          manId: manufacturer._id,
-                          manRate: manufacturer.exchangeRate,
-                          currency: isDollar,
+            </View>
 
 
-                          email,
-                        })
+            <View className="flex-row w-full items-center justify-between px-4">
+              <View>
+                <Text className="justify-center items-center space-x-2" style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'orange' }}>
+                  <Icon.User size={25} color="orange" />Suppliers
+                </Text>
+              </View>
+
+              <View>
+                <TouchableOpacity onPress={() => navigation.navigate('allmanufacturers')}>
+                  <Text className="text-orange-500 font-semibold">View all</Text>
+                </TouchableOpacity>
+
+              </View>
+            </View>
 
 
-                      }
-                      key={manufacturer._id}
-                    >
-                      <View className="space-y-1 mr-4" key={manufacturer.id}>
 
 
-                        <View className="p-2 rounded-full h-18 w-18 border border-orange-400 border-md">
-                          <Image className="rounded-full"
-                            source={require('../assets/opaso.png')}
-                            style={{
-                              height: 60, width: 60,
-                            }}
-                            resizeMode="cover"
-                          />
+
+
+            <View>
+
+              {loading ? (
+                <View className="justify-center items-center flex-1 bg-transparent w-full">
+                  <Text>Loading.....</Text>
+                </View>
+              ) : (
+                <View className="px-5 justify-center items-center w-full">
+                  <Animated.View className="w-full flex-row py-3 justif-center items-center" entering={FadeInLeft.delay(200).springify()} horizontal={true}>
+                    {manufacturer.slice(0, 4).map((manufacturer) => (
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("manufacturers", {
+                            manName: manufacturer.firstName,
+                            mancat1: manufacturer.category,
+                            manEmail: manufacturer.email,
+                            manAddress: manufacturer.address,
+                            manPhone: manufacturer.phoneNumber,
+                            manId: manufacturer._id,
+                            manRate: manufacturer.exchangeRate,
+                            currency: isDollar,
+
+
+                            email,
+                          })
+
+
+                        }
+                        key={manufacturer._id}
+                      >
+                        <View className="space-y-1 mr-4" key={manufacturer.id}>
+
+
+                          <View className="p-2 rounded-full h-18 w-18 border border-orange-400 border-md">
+                            <Image className="rounded-full"
+                              source={require('../assets/opaso.png')}
+                              style={{
+                                height: 60, width: 60,
+                              }}
+                              resizeMode="cover"
+                            />
+                          </View>
+                          <Text className="text-neutral-600 mt-3">
+
+                            {manufacturer.firstName.length > 8 ? manufacturer.firstName.slice(0, 8) + '...' : manufacturer.firstName}
+                          </Text>
+
                         </View>
-                        <Text className="text-neutral-600 mt-3">
+                      </TouchableOpacity>
+                    ))}
+                  </Animated.View>
+                </View>
 
-                          {manufacturer.name.length > 8 ? manufacturer.name.slice(0, 8) + '...' : manufacturer.name}
-                        </Text>
+              )}
 
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </Animated.View>
-              </ScrollView>
+
+            </View>
+
+
+            {/* what we do as opasso */}
+            <View className="px-5 justify-center items-center my-3">
+              <TouchableOpacity onPress={handleLikeModalAllow} className="justify-center rounded-xl items-center border border-orange-400 border-sm w-80 h-10">
+                <Text className="text-lg font-bold text-orange-400">What we do.</Text>
+              </TouchableOpacity>
+            </View>
+
+
+
+
+
+            <View className="px-5"
+              style={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              <View>
+                <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 5 }}>
+                  Product Categories
+                </Text>
+              </View>
+
+
+            </View>
+            {loading ? (
+              <Loader email={email} />
+            ) : (
+
+              <Categories email={email} handleModal={handleShowLoginReq} logstate={loginState} />
 
             )}
 
 
-          </View>
 
-
-          {/* what we do as opasso */}
-          <View className="px-5 justify-center items-center my-3">
-            <TouchableOpacity onPress={handleLikeModalAllow} className="justify-center rounded-xl items-center border border-orange-400 border-sm w-80 h-10">
-              <Text className="text-lg font-bold text-orange-400">What we do.</Text>
-            </TouchableOpacity>
-          </View>
-
-
-
-
-
-          <View
-            style={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <View>
-              <Text style={{ fontWeight: "bold", fontSize: 18, marginTop: 5 }}>
-                Product Categories
-              </Text>
-            </View>
-
-
-          </View>
-          {loading ? (
-            <Loader email={email} />
-          ) : (
-
-            <Categories email={email} handleModal={handleShowLoginReq} logstate={loginState} />
-
-          )}
-
-
-
-          {/* <CarouselCard data={trending} /> */}
-          <Events />
+            {/* <CarouselCard data={trending} /> */}
+            <Events />
 
 
 
@@ -520,14 +477,14 @@ const LandingScreen = ({ navigation, route }) => {
 
 
 
-          {/**End of brands */}
-          <MenuModal isBottomSheetVisible={isBottomSheetVisible} setBottomSheetVisible={setBottomSheetVisible} Email={email} />
+            {/**End of brands */}
+            <MenuModal isBottomSheetVisible={isBottomSheetVisible} setBottomSheetVisible={setBottomSheetVisible} Email={email} />
 
 
 
 
-          {/* handle logout */}
-          {/* <Modal
+            {/* handle logout */}
+            {/* <Modal
           className="justify-center items-center flex-1"
           isVisible={isLogoutConfirm}
           animationIn="slideInUp"
@@ -552,110 +509,110 @@ const LandingScreen = ({ navigation, route }) => {
           </View>
         </Modal> */}
 
-          <Modal
-            isVisible={isLogoutConfirm}
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            backdropOpacity={0.5}
-            onBackdropPress={() => setLogoutConfirm(false)}
-            onBackButtonPress={() => setLogoutConfirm(false)}
-            style={styles.modalContainer}
-          >
-            <View
-              className=""
-              style={[
-                styles.bottomSheetContainer1,
-                { height: windowHeight * 0.4 },
-              ]}
+            <Modal
+              isVisible={isLogoutConfirm}
+              animationIn="slideInUp"
+              animationOut="slideOutDown"
+              backdropOpacity={0.5}
+              onBackdropPress={() => setLogoutConfirm(false)}
+              onBackButtonPress={() => setLogoutConfirm(false)}
+              style={styles.modalContainer}
             >
-              <View className="justify-center items-center flex-1 w-full h-full">
+              <View
+                className=""
+                style={[
+                  styles.bottomSheetContainer1,
+                  { height: windowHeight * 0.4 },
+                ]}
+              >
+                <View className="justify-center items-center flex-1 w-full h-full">
 
-                <LottieView
-                  className="justify-center items-center" style={{ width: '40%',height:'40%' }}
-                  source={require("../assets/logoutconfirm.json")}
-                  autoPlay
-                  loop={true}
-                // onAnimationFinish={() => {
-                //   handleLikeModalClose();
-                // }}
-                />
-                <Text className="text-slate-600 text-center font-semibold text-2xl">Confirm Logout.</Text>
-                <View className="flex-row justify-between items-center w-full px-5">
+                  <LottieView
+                    className="justify-center items-center" style={{ width: '40%', height: '40%' }}
+                    source={require("../assets/logoutconfirm.json")}
+                    autoPlay
+                    loop={true}
+                  // onAnimationFinish={() => {
+                  //   handleLikeModalClose();
+                  // }}
+                  />
+                  <Text className="text-slate-600 text-center font-semibold text-2xl">Confirm Logout.</Text>
+                  <View className="flex-row justify-between items-center w-full px-5">
 
-                  <TouchableOpacity onPress={() => setLogoutConfirm(false)} className="bg-orange-400 w-32 h-12 my-3 rounded-2xl justify-center items-center">
-                    <Text style={styles.btntext}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={logout} className="bg-red-400 w-32 h-12 my-3 rounded-2xl justify-center items-center">
-                    <Text style={styles.btntext}>Logout</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setLogoutConfirm(false)} className="bg-orange-400 w-32 h-12 my-3 rounded-2xl justify-center items-center">
+                      <Text style={styles.btntext}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleLogout} className="bg-red-400 w-32 h-12 my-3 rounded-2xl justify-center items-center">
+                      <Text style={styles.btntext}>Logout</Text>
+                    </TouchableOpacity>
+                  </View>
+
                 </View>
 
               </View>
-
-            </View>
-          </Modal>
+            </Modal>
 
 
-          {/* ask user if they know how to use the app */}
-          <Modal
-            className="justify-center items-center flex-1"
-            isVisible={showLikeModal}
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            backdropOpacity={0.5}
-            onBackdropPress={handleLikeModalClose}
-            onBackButtonPress={handleLikeModalClose}
-            style={styles.modalContainer}
-          >
-            <View className="bg-white w-80 h-60 px-5 rounded-3xl justify-center items-center">
-              <Text style={{ fontSize: 20, marginBottom: 20 }}>
-                Wanna know what we do?
-              </Text>
-              <View style={styles.logmenu}>
-                <TouchableOpacity onPress={handleLikeModalAllow} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
-                  <Text style={styles.btntext}>Yes</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleLikeModalClose} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
-                  <Text style={styles.btntext}>Skip</Text>
-                </TouchableOpacity>
+            {/* ask user if they know how to use the app */}
+            <Modal
+              className="justify-center items-center flex-1"
+              isVisible={showLikeModal}
+              animationIn="slideInUp"
+              animationOut="slideOutDown"
+              backdropOpacity={0.5}
+              onBackdropPress={handleLikeModalClose}
+              onBackButtonPress={handleLikeModalClose}
+              style={styles.modalContainer}
+            >
+              <View className="bg-white w-80 h-60 px-5 rounded-3xl justify-center items-center">
+                <Text style={{ fontSize: 20, marginBottom: 20 }}>
+                  Wanna know what we do?
+                </Text>
+                <View style={styles.logmenu}>
+                  <TouchableOpacity onPress={handleLikeModalAllow} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
+                    <Text style={styles.btntext}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleLikeModalClose} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
+                    <Text style={styles.btntext}>Skip</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
+            </Modal>
 
 
 
 
-          {/* modal for user account creation create */}
-          <Modal
-            className="justify-center items-center flex-1"
-            isVisible={showLoginReqModal}
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            backdropOpacity={0.5}
-            onBackdropPress={handleLikeModalClose}
-            onBackButtonPress={handleLikeModalClose}
-            style={styles.modalContainer}
-          >
-            <View className="bg-white w-80 h-60 px-5 rounded-3xl justify-center items-center">
-              <Text style={{ fontSize: 20, marginBottom: 20 }}>
-                You dont have an account or not logged in yet.
-              </Text>
-              <View style={styles.logmenu}>
-                <TouchableOpacity onPress={handleLogin} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
-                  <Text style={styles.btntext}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleLoginReqClose} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
-                  <Text style={styles.btntext}>Skip</Text>
-                </TouchableOpacity>
+            {/* modal for user account creation create */}
+            <Modal
+              className="justify-center items-center flex-1"
+              isVisible={showLoginReqModal}
+              animationIn="slideInUp"
+              animationOut="slideOutDown"
+              backdropOpacity={0.5}
+              onBackdropPress={handleLikeModalClose}
+              onBackButtonPress={handleLikeModalClose}
+              style={styles.modalContainer}
+            >
+              <View className="bg-white w-80 h-60 px-5 rounded-3xl justify-center items-center">
+                <Text style={{ fontSize: 20, marginBottom: 20 }}>
+                  You dont have an account or not logged in yet.
+                </Text>
+                <View style={styles.logmenu}>
+                  <TouchableOpacity onPress={handleLogin} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
+                    <Text style={styles.btntext}>Login</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleLoginReqClose} className="bg-orange-400 w-40 h-12 my-3 rounded-2xl justify-center items-center">
+                    <Text style={styles.btntext}>Skip</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
+            </Modal>
 
 
-        </ScrollView>
-      </View>
+          </ScrollView>
+        </View>
       )}
-      
+
     </SafeAreaView>
   );
 };
@@ -729,9 +686,7 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: "contain",
   },
-  container1: {
-    paddingHorizontal: 15,
-  },
+
   image1: {
     height: "70%",
     backgroundColor: "#fff",

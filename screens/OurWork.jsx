@@ -20,7 +20,7 @@ const OurWork = ({ navigation }) => {
       id: 2,
       title: "Search for your desired manufacturer.",
       description:
-        "Are youa  reseller? Concentrate business, we have the PRICE LISTS.",
+        "Are you a reseller? Concentrate on business, we have the PRICE LISTS.",
       image: require("../assets/use/search.png"),
     },
     {

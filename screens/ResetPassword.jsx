@@ -106,7 +106,7 @@ const ResetPassword = ({ navigation, route }) => {
 
 
         <View className="mt-12">
-          <Image source={require('../assets/logo.jpg')} className="h-16 w-16" />
+          <Image source={require('../assets/rsp.png')} className="h-16 w-16" />
         </View>
 
         <View className="mt-12">

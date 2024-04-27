@@ -140,7 +140,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image }} className="h-32 w-32 rounded-full border border-sm border-slate-900" />
               ) : (
                 <Image
-                  source={require("../assets/logo.jpg")}
+                  source={require("../assets/splashed.png")}
                   className="h-32 w-32 rounded-full border border-sm border-slate-900"
                 />
               )}
@@ -148,7 +148,7 @@ const ProfileScreen = ({ navigation, route }) => {
           </View>
 
           <View className="justify-center items-center mb-8">
-            <Text className="text-slate-900 font-bold text-3xl">{userdata.name}</Text>
+            <Text className="text-slate-900 font-bold text-3xl">{userdata.firstName}</Text>
           </View>
 
           <View className="justify-center items-center px-5 ">
@@ -193,16 +193,7 @@ const ProfileScreen = ({ navigation, route }) => {
                   <Text className="text-slate-700 text-xl font-semibold">{userdata.createdAt}</Text>
                 </View>
               </View>
-              <View className="border border-b-1 flex-row items-center border-slate-300 border-t-0 border-l-0 border-r-0 py-2">
-
-                <View className="px-4">
-                  <Icon.Eye color="black" size={30} />
-                </View>
-                <View>
-                  <Text className="text-slate-500">UserId</Text>
-                  <Text className="text-slate-700 text-xl font-semibold">{userdata._id}</Text>
-                </View>
-              </View>
+              
 
             </View>
 

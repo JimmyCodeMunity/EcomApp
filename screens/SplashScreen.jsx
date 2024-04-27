@@ -27,21 +27,22 @@ const SplashScreen = ({ navigation }) => {
   };
   return (
     <SafeAreaView
-      className="flex-1 justify-center items-center"
-      style={{ backgroundColor: "orange" }}
+      className="flex-1 justify-center items-center bg-white"
+      
     >
       <StatusBar style="light" />
       <View className="justify-center items-center">
         <View>
-          <LottieView
+          {/* <LottieView
             className="justify-center items-center"
             style={{ width: "40%", height: "40%" }}
             source={require("../assets/anim.json")}
             autoPlay
             loop={true}
             onAnimationFinish={() => {}}
-          />
-          <Text>Loading</Text>
+          /> */}
+          <Animated.Image entering={FadeInDown.delay(300).springify()} source={require('../assets/splashed.png')} className="h-60 w-60"/>
+          
         </View>
         
         <Animated.View

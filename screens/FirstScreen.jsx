@@ -37,6 +37,7 @@ import Deals from "../components/Deals";
 import Events from "../components/Events";
 import MenuModal from "../components/MenuModal";
 import FirstMenu from "../components/FirstMenu";
+import DemoEvents from "./DemoEvents";
 
 
 
@@ -137,6 +138,7 @@ const FirstScreen = ({ navigation, route }) => {
   const handleLikeModalAllow = () => {
     handleLikeModalClose();
     navigation.navigate('ourwork');
+    
     // You can add logic here for handling the user's response
   };
 
@@ -194,8 +196,8 @@ const FirstScreen = ({ navigation, route }) => {
       <SafeAreaView style={styles.top}>
         <View style={styles.menu}>
           <View>
-            <TouchableOpacity onPress={() => setBottomSheetVisible(true)}>
-              <FeatherIcon name="menu" size={25} color="orange" />
+            <TouchableOpacity onPress={() => setBottomSheetVisible(true)} className="space-x-10">
+              <FeatherIcon name="menu" size={30} color="orange" />
             </TouchableOpacity>
           </View>
 
@@ -389,11 +391,9 @@ const FirstScreen = ({ navigation, route }) => {
 
         {/* <CarouselCard data={trending} /> */}
         <View className="w-full mb-3">
-          <Text className="font-bold text-lg tracking-wide">
-            Ads & Promotions
-          </Text>
+          
         </View>
-        <Events />
+        <DemoEvents handleModal={handleShowLoginReq} logstate={loginState}/>
 
 
 
@@ -487,7 +487,7 @@ const FirstScreen = ({ navigation, route }) => {
             <View className="justify-center items-center flex-1 w-full h-full">
 
               <LottieView
-                className="justify-center items-center" style={{ width: '50%', }}
+                className="justify-center items-center" style={{ width: '50%',height:'40%' }}
                 source={require("../assets/authrequest.json")}
                 autoPlay
                 loop={true}

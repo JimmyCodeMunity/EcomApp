@@ -70,6 +70,13 @@ const GeneralSettings = ({ navigation, route }) => {
   const visitWebsite = () =>{
     Linking.openURL("https://resellersprint.com");
   }
+  const becomeSupplier = () =>{
+    Linking.openURL("https://resellersprint.com/shop-create");
+  }
+  const privacyPolicy = () =>{
+    // Linking.openURL("https://docs.google.com/document/d/1AAUMvcyYzh1Qn656M_LlZxtvz_fLf6sUyWlIYDI1Vcc/edit?usp=sharing");
+    navigation.navigate('Policy')
+  }
 
 
 
@@ -91,9 +98,10 @@ const GeneralSettings = ({ navigation, route }) => {
   };
   const settingsOptions = [
     { title: 'Visit website', onPress: visitWebsite, icon: 'globe' },
-    { title: 'Become a manufacturer', onPress: () => console.log('Bluetooth pressed'), icon: 'user' },
-    { title: 'Rate Us on google', onPress: () => console.log('Cellular pressed'), icon: 'star' },
-    { title: 'Share app', onPress: handleShare, icon: 'share' },
+    { title: 'Become a Supplier', onPress: becomeSupplier, icon: 'user' },
+    // { title: 'Rate Us', onPress: () => console.log('Cellular pressed'), icon: 'star' },
+    // { title: 'Share app', onPress: handleShare, icon: 'share' },
+    { title: 'Privacy Policy', onPress: privacyPolicy, icon: 'book' },
 
     // Add more settings options as needed
   ];
@@ -109,6 +117,7 @@ const GeneralSettings = ({ navigation, route }) => {
       // Replace 'userToken' with your specific token or session key
       // Navigate to the login or authentication screen
       // Example using react-navigation:
+      setLogoutConfirm(false);
       navigation.navigate("Login");
     } catch (error) {
       console.log(error);
@@ -147,7 +156,7 @@ const GeneralSettings = ({ navigation, route }) => {
                 <TouchableOpacity
                   onPress={() => navigation.navigate('Profile', { email: email })}
                   className="border border-t-0 border-r-0 border-l-0 border-slate-300 px-3 h-16 flex-row justify-between items-center border-b-slate-300">
-                  <Text className="text-2xl font-semibold">{userdata.name}</Text>
+                  <Text className="text-2xl font-semibold">{userdata.firstName}</Text>
                   <FeatherIcon name="arrow-right" size={23} />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -180,7 +189,7 @@ const GeneralSettings = ({ navigation, route }) => {
 
 
               <View className="justify-center items-center">
-                <TouchableOpacity onPress={() => setLogoutConfirm(true)} className="bg-orange-400 h-10 rounded-2xl justify-center items-center my-7 w-60">
+                <TouchableOpacity onPress={() => navigation.navigate('logoutconfirm')} className="bg-orange-400 h-10 rounded-2xl justify-center items-center my-7 w-60">
                   <Text className="text-white text-xl">Logout</Text>
                 </TouchableOpacity>
               </View>

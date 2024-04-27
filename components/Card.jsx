@@ -15,16 +15,7 @@ export default function CarouselCard({ data, navigation }) {
         { id: 4, image: require('../assets/card4.jpg') },
     ];
     return (
-        <Animated.View entering={FadeInDown.delay(400).springify().
-            withSpring(sv.value, {
-              mass: 1,
-              damping: 10,
-              stiffness: 100,
-              overshootClamping: false,
-              restDisplacementThreshold: 0.01,
-              restSpeedThreshold: 2,
-              reduceMotion: ReduceMotion.System,
-            })
+        <Animated.View entering={FadeInDown.delay(400).springify()
           } className="mt-8" style={{ height: 200 }}>
             <Carousel
                 data={carouselData}

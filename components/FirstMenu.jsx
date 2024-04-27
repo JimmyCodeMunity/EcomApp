@@ -57,24 +57,29 @@ const FirstMenu = ({ isBottomSheetVisible, setBottomSheetVisible }) => {
                     </View>
 
                     <View className="justify-center mt-7">
-                        
+
                         <Text className="my-3 font-bold text-slate-600 text-xl">Support</Text>
 
                         <View className="border border-b-2 border-slate-300 h-30 rounded-2xl mb-8">
-                            <TouchableOpacity onPress={() => navigation.navigate("Faq", setBottomSheetVisible(false))} className="p-5 rounded-2xl w-full border border-b-1 border-t-0 border-l-0 border-r-0 border-slate-300">
+                            <TouchableOpacity onPress={() => navigation.navigate("Faq")} className="p-5 rounded-2xl w-full border border-b-1 border-t-0 border-l-0 border-r-0 border-slate-300">
                                 <Text className="text-slate-600 ">FAQ</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate("Use",setBottomSheetVisible(false))} className="p-5 rounded-2xl w-full border border-b-1 border-t-0 border-l-0 border-r-0 border-slate-300 flex-row justify-between items-center">
+                            <TouchableOpacity onPress={() => navigation.navigate("Use")} className="p-5 rounded-2xl w-full border border-b-1 border-t-0 border-l-0 border-r-0 border-slate-300 flex-row justify-between items-center">
                                 <Text className="text-slate-600 ">How to Use App</Text>
                                 <FeatherIcon name="arrow-right" size={20} color="gray" />
                             </TouchableOpacity>
                         </View>
                         <View className="border mt-8 border-b-2 border-slate-300 h-30 rounded-2xl mb-5">
-                            <TouchableOpacity onPress={() => navigation.navigate("About", setBottomSheetVisible(false))} className="p-5 rounded-2xl w-full flex-row justify-between items-center">
-                                <Text className="text-slate-600 ">About</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("Policy")} className="p-5 rounded-2xl w-full border border-b-1 border-t-0 border-l-0 border-r-0 border-slate-300">
+                                <Text className="text-slate-600 ">Privacy Policy</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate("About")} className="p-5 rounded-2xl w-full flex-row justify-between items-center">
+                                <Text className="text-slate-600 ">About Us</Text>
                                 <FeatherIcon name="arrow-right" size={20} color="gray" />
 
                             </TouchableOpacity>
+
+
 
                         </View>
                         <View className="border mt-8 border-b-2 border-slate-300 h-30 rounded-2xl mb-5">
@@ -83,7 +88,8 @@ const FirstMenu = ({ isBottomSheetVisible, setBottomSheetVisible }) => {
                                 <FeatherIcon name="key" size={20} color="gray" />
 
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate("Register", setBottomSheetVisible(false))} className="p-5 rounded-2xl w-full flex-row border border-slate-300 border-t-1 border-b-0 border-l-0 border-r-0 justify-between items-center">
+
+                            <TouchableOpacity onPress={() => navigation.navigate("Register")} className="p-5 rounded-2xl w-full flex-row border border-slate-300 border-t-1 border-b-0 border-l-0 border-r-0 justify-between items-center">
                                 <Text className="text-slate-600 ">Create Account</Text>
                                 <FeatherIcon name="user" size={20} color="gray" />
 

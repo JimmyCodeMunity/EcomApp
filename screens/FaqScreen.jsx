@@ -7,7 +7,7 @@ import LottieView from 'lottie-react-native';
 const FaqScreen = ({route}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
-  const link = "https://opasso-frontend.vercel.app/";
+  const link = "https://resellersprint.com/faq";
 
   useEffect(() => {
     checkInternetConnection();
@@ -42,7 +42,7 @@ const FaqScreen = ({route}) => {
         </View>
       ) : (
         <WebView 
-        onLoadStart={() => setIsLoading(true)}
+        // onLoadStart={() => setIsLoading(true)}
         onLoad={() => setIsLoading(false)}
         source={{ uri: link }} />
       )}

@@ -38,20 +38,20 @@ const Events = () => {
         imageUri: event.images[0],
         link: event.shop,
         description: event.event_description,
+        p_description:event.description,
         original: event.originalPrice,
         discount: event.discountPrice,
         seller:event.shop.name,
+        phone:event.shop.phoneNumber,
     }));
 
     const renderCarouselItem = ({ item }) => {
-        const handleEventPress = () => {
-            Linking.openURL(item.link)
-        }
+        
         return (
             <View>
 
 
-                <TouchableWithoutFeedback onPress={() => navigation.navigate('webdeals', { link: item.link })} className="">
+                <TouchableWithoutFeedback className="">
 
                     <Image
                         className="rounded-3xl shadow-lg shadow-gray-900"
@@ -85,7 +85,7 @@ const Events = () => {
                     slideStyle={{ display: 'flex', alignItems: 'center' }}
                     loop={true}
                     autoplay={true}
-                    autoplayInterval={3000}
+                    autoplayInterval={5000}
                     // layout={'stack'}
                     layoutCardOffset={`18`}
                 />
@@ -99,8 +99,19 @@ const Events = () => {
 };
 
 const ProductCard = ({ item }) => {
+    const navigation  = useNavigation()
+    const handleEventPress = () => {
+        Linking.openURL(item.link)
+    }
     return (
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={()=>navigation.navigate('eventdata',{
+            itemName:item.title,
+            itemDescription:item.p_description,
+            itemOriginal:item.original,
+            itemDiscount:item.discount,
+            itemSeller:item.seller,
+            itemPhone:item.phone
+        })}>
             <View className="h-40 w-full rounded-3xl shadow-sm bg-gray-300">
                 <View className="flex-row justify-between items-center">
                     <View className="px-3 p-3" style={{ width: '50%' }}>
@@ -114,6 +125,7 @@ const ProductCard = ({ item }) => {
                     <View className="justify-center items-center" style={{ width: '30%', zIndex: -2 }}>
                         <Image source={require('../assets/user.jpeg')} className="h-16 w-16 my-1 rounded-full"/>
                         <Text className="font-semibold">{item.seller}</Text>
+                        
                     </View>
                 </View>
 

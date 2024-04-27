@@ -18,6 +18,7 @@ const EditProfile = ({ navigation, route }) => {
   const { userEmail } = route.params;
   const [userdata, setUserdata] = useState({});
   const [name, setName] = useState("");
+  const [lname, setLName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -29,13 +30,14 @@ const EditProfile = ({ navigation, route }) => {
 
   const getUserdata = () => {
     setLoading(true);
-    fetch("https://opasso-app-backend.vercel.app/api/user/usersdata")
+    fetch("https://res-server-sigma.vercel.app/api/user/usersdata")
       .then((response) => response.json())
       .then((data) => {
         const user = data.find((item) => item.email === userEmail);
         if (user) {
           setUserdata(user);
-          setName(user.name);
+          setName(user.firstName);
+          setLName(user.lastName);
           setEmail(user.email);
           setAddress(user.address);
           setPhone(user.phoneNumber);
@@ -50,9 +52,10 @@ const EditProfile = ({ navigation, route }) => {
   const updateUser = async () => {
     try {
       const response = await axios.put(
-        `https://opasso-app-backend.vercel.app/api/user/updateuser/${userEmail}`,
+        `https://res-server-sigma.vercel.app/api/user/updateuser/${userEmail}`,
         {
-          name: name,
+          firstName: name,
+          lastName: lname,
           email: email,
           phoneNumber: phone,
           address: address,
@@ -105,7 +108,7 @@ const EditProfile = ({ navigation, route }) => {
         <Animated.View entering={FadeInDown.delay(300).springify()}>
           <View className="justify-center items-center">
             <Text className="text-slate-500 text-3xl font-semibold">
-              {userdata.name}'s Space
+              {userdata.firstName}'s Space
             </Text>
           </View>
 
@@ -122,10 +125,20 @@ const EditProfile = ({ navigation, route }) => {
             </View>
             <View className="my-5 justify-center items-start w-full">
               <Text className="text-lg font-semibold text-slate-600">
-                UserName
+                FirstName
               </Text>
               <TextInput
                 value={name}
+                onChangeText={(text) => setName(text)}
+                className="border border-slate-200 rounded-2xl h-10 w-full px-4"
+              />
+            </View>
+            <View className="my-5 justify-center items-start w-full">
+              <Text className="text-lg font-semibold text-slate-600">
+                LastName
+              </Text>
+              <TextInput
+                value={lname}
                 onChangeText={(text) => setName(text)}
                 className="border border-slate-200 rounded-2xl h-10 w-full px-4"
               />

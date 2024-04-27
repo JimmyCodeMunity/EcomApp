@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Linking,
+  TextInput,
 } from "react-native";
 import { Table, TableWrapper, Row, Rows } from "react-native-table-component";
 import axios from "axios";
@@ -22,7 +23,7 @@ import Modal from "react-native-modal";
 import { useCurrency } from "../components/CurrencyProvider";
 import { StatusBar } from "expo-status-bar";
 import Loading from "../components/Loading";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
@@ -51,6 +52,9 @@ const Manufacturer = ({ route, navigation }) => {
   );
   const [filterModal, setFilterModal] = useState(false);
 
+  const [filterName, setFilterName] = useState("");
+  const [filterPrice, setFilterPrice] = useState("");
+  const [filterBrand, setFilterBrand] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { isDollar, setIsDollar } = useCurrency();
 
@@ -63,6 +67,7 @@ const Manufacturer = ({ route, navigation }) => {
   const [isFocusCat, setIsFocusCat] = useState(false);
   const [isFocusPrice, setIsFocusPrice] = useState(false);
   const [selectedPriceRange, setSelectedPriceRange] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   // Inside your component...
   const [partNumberFilter, setPartNumberFilter] = useState(""); // Add this state variable
 
@@ -70,18 +75,59 @@ const Manufacturer = ({ route, navigation }) => {
     setModalVisible(false);
   };
 
+  const handleLinkClick = () => {
+    Linking.openURL(
+      `https://react-pdf-download-reseller.vercel.app/manufaclist/${manId}`
+    );
+  };
 
-  const handleLinkClick = () =>{
-    Linking.openURL(`https://react-pdf-download-reseller.vercel.app/manufaclist/${manId}`);
+  const [exchangeRate, setExchangeRate] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [category, setCategory] = useState([]);
+  const [supplierData, setSupplierData] = useState([]);
+  const fetchSupplierDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://res-server-sigma.vercel.app/api/shop/usersdata/${manId}`);
+      const supdata = response.data;
+      const erate = response.data.user.dollarExchangeRate;
+      const fname = response.data.user.firstName;
+      const lname = response.data.user.lastName;
+      const phone = response.data.user.phoneNumber;
+      const cat = response.data.user.categories;
+      const categoryText = cat.join(", ");
+      setExchangeRate(erate);
+      setFirstName(fname);
+      setLastName(lname);
+      setPhoneNumber(phone);
+      setCategory(categoryText);
+      // console.log("cat",categoryText)
+      setSupplierData(supdata);
+      
+
+    } catch (error) {
+
+    }
   }
+  // console.log("gotten data", supplierData)
+
+
+  useEffect(() => {
+    fetchSupplierDetails()
+
+  }, [manId])
+  // console.log(phoneNumber)
 
   const handleCall = () => {
-    const phoneNumber = manPhone;
-    const countryCode = "+254";
+    const cphoneNumber = phoneNumber;
+    // console.log(cphoneNumber);
+    // const countryCode = "+254";
 
     // Check if the phone number is valid
-    if (manPhone) {
-      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+    if (cphoneNumber) {
+      const fullPhoneNumber = `${phoneNumber}`;
       // Construct the phone call URL
       const phoneURL = `tel:${fullPhoneNumber}`;
 
@@ -102,10 +148,11 @@ const Manufacturer = ({ route, navigation }) => {
 
   //handle whatsapp
   const handleWhatsapp = () => {
-    const phoneNumber = manPhone;
-    const countryCode = "+254";
-    if (phoneNumber) {
-      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+    const wphoneNumber = phoneNumber;
+    // const countryCode = "+254";
+    console.log(wphoneNumber)
+    if (wphoneNumber) {
+      const fullPhoneNumber = `${phoneNumber}`;
       const phoneURL = `tel:${fullPhoneNumber}`;
       // Construct the WhatsApp chat URL
       const whatsappURL = `https://wa.me/${fullPhoneNumber}`;
@@ -131,11 +178,17 @@ const Manufacturer = ({ route, navigation }) => {
     fetchData();
   }, [manId]);
 
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+  };
+
+  
+
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://opasso-app-backend.vercel.app/api/product/productlist/${manId}`,
+        `https://res-server-sigma.vercel.app/api/product/productlist/${manId}`,
         {
           timeout: 10000,
         }
@@ -144,15 +197,16 @@ const Manufacturer = ({ route, navigation }) => {
       setFilteredProducts(apiData);
       setProducts(apiData); // Update the products state
       setLoading(false);
+      // console.log(apiData)
 
       if (apiData.length > 0) {
-        setTableHead(["Name", "PartNo.", "Price", "Action"]);
+        setTableHead(["Name", "PartNo.", "Price", "Available", "Action"]);
 
         const rows = apiData.map((item, index) => [
           item.name,
           item.partNumber,
-          item.discountPrice,
-          item.available,
+          item.price,
+          item.isAvailable,
         ]);
       } else {
         setProducts([]);
@@ -191,99 +245,63 @@ const Manufacturer = ({ route, navigation }) => {
 
     Alert.alert("Selected Item", selected[1]);
   };
+  const [showSearch, setShowSearch] = useState(false);
 
-  //Apply filters when any filter criteria change
-  useEffect(() => {
-    applyFilters();
-  }, [priceFilter, categoryFilter, isDollar]);
-
+  //filter
   // Apply filters function
-  const applyFilters = () => {
-    // Filter by price
-    const priceFiltered = priceFilter
-      ? products.filter((product) => {
-          const price = isDollar
-            ? product.discountPrice / product.shop.exchangeRate
-            : product.discountPrice;
-          return price >= priceFilter * 0.9 && price <= priceFilter * 1.1;
-        })
-      : products;
-
-    // Filter by name
-    const nameFiltered = categoryFilter
-      ? priceFiltered.filter(
-          (product) =>
-            product.name &&
-            product.name.toLowerCase().includes(categoryFilter.toLowerCase())
-        )
-      : priceFiltered;
-
-    // Filter by brand
-    const brandFiltered = brandFilter
-      ? nameFiltered.filter(
-          (product) =>
-            product.brand &&
-            product.brand.toLowerCase().includes(brandFilter.toLowerCase())
-        )
-      : nameFiltered;
-
-    // Filter by part number
-    const partNumberFiltered = partNumberFilter
-      ? brandFiltered.filter(
-          (product) =>
-            product.partNumber &&
-            product.partNumber
-              .toLowerCase()
-              .includes(partNumberFilter.toLowerCase())
-        )
-      : brandFiltered;
-
-    setFilteredProducts(partNumberFiltered);
-
-    if (partNumberFiltered.length === 0) {
-      // Handle the case when no products match the filters
-      setProductsNotFound(true);
-    } else {
-      setProductsNotFound(false);
-    }
+  const applyFilter = () => {
+    setSearchQuery(filterName || filterPrice || filterBrand);
   };
+
+  const searchedProducts = products.filter(
+    (products) =>
+      products.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      products.price.toString().includes(searchQuery.toLowerCase()) ||
+      products.brand.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Function to clear filters
   const clearFilters = () => {
-    setPriceFilter(""); // Clear price filter
-    setNameFilter(""); // Clear name filter
-    setBrandFilter("");
-    setPartNumberFilter("");
-    setCategoryFilter("");
+    setFilterBrand("");
+    setFilterPrice("");
+    setFilterName("");
+    setSearchQuery("");
+
     setFilteredProducts(products); // Reset filteredProducts to all products
   };
 
   const renderProductTable = () => {
-    const tableData = products.map((item) => [
+    const tableData = searchedProducts.map((item) => [
       item.name,
-      item.partNumber,
+      item.sku,
       isDollar
         ? `$ ${Number(
-            (item.discountPrice / item.shop.exchangeRate).toFixed(2)
-          ).toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`
-        : `KES ${Number(item.discountPrice.toFixed(2)).toLocaleString(
-            "en-US"
-          )}`,
+          (item.price / exchangeRate).toFixed(2)
+        ).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`
+        : `KES ${Number(item.price.toFixed(2)).toLocaleString(
+          "en-US"
+        )}`,
+      item.isAvailable ? (
+        <Text className="text-center items-center">Available</Text>
+      ) : (
+        <Text className="text-center items-center">Unavailable</Text>
+      ),
       <View className="justify-center items-center">
         <TouchableOpacity
           className="bg-orange-500 w-16 rounded-2xl h-8 justify-center items-center"
           onPress={() => {
             setSelected([
-              item.shop.name,
               item.name,
               item.brand,
-              item.category,
-              item.shop.phoneNumber,
-              item.shop.exchangeRate,
-              item.discountPrice,
+              category,
+              phoneNumber,
+              exchangeRate,
+              item.price,
+              firstName,
+              lastName
             ]);
             setModalVisible(true);
           }}
@@ -299,7 +317,7 @@ const Manufacturer = ({ route, navigation }) => {
         <Row
           data={tableHead}
           flexArr={[5, 4, 2, 2]}
-          widthArr={[160, 180, 200, 220]}
+          widthArr={[160, 180, 200, 220, 180]}
           style={styles.head}
           textStyle={styles.text}
         />
@@ -307,7 +325,7 @@ const Manufacturer = ({ route, navigation }) => {
           <Rows
             data={tableData}
             flexArr={[5, 4, 2, 2]}
-            widthArr={[160, 180, 200, 220]}
+            widthArr={[160, 180, 200, 220, 180]}
             style={styles.row}
             textStyle={styles.text}
           />
@@ -317,8 +335,28 @@ const Manufacturer = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={styles.container}>
-      <View className="flex-row justify-between items-center px-5 py-5">
+    <SafeAreaView className="flex-1 w-full bg-white">
+      <View className="justify-center items-center absolute w-full h-32" style={{ bottom: 10, zIndex: 20 }}>
+        <View className="w-60 justify-center items-center my-5" >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="py-5 bg-orange-400 rounded-2xl w-full justify-center items-center"
+          >
+            {/* <Icon.X size={20} color="white" /> */}
+            <Text className="text-white font-bold text-xl tracking-wide">
+              Close
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View className="px-5 mt-5">
+        <Text className="text-2xl font-semibold text-slate-600">{manName}</Text>
+        <Text className="text-xl font-semibold text-orange-300">
+          {manPhone}
+        </Text>
+      </View>
+      <View className="flex-row justify-between items-center px-5 space-y-1">
         <View>
           <Text className="text-xl text-slate-500 font-semibold flex-row justify-between item-center">
             Currency:
@@ -359,6 +397,25 @@ const Manufacturer = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
           <View>
+            {showSearch ? (
+              <TouchableOpacity
+                className="bg-orange-400 h-10 w-10 rounded-full justify-center items-center flex-1"
+                //  onPress={()=>navigation.navigate('pdfdownloadcategory',{catname:categoryName})}
+                onPress={toggleSearch}
+              >
+                <Icon.Search size={30} color="black" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                className=""
+                //  onPress={()=>navigation.navigate('pdfdownloadcategory',{catname:categoryName})}
+                onPress={toggleSearch}
+              >
+                <Icon.Search size={30} color="black" />
+              </TouchableOpacity>
+            )}
+          </View>
+          <View>
             <Switch
               trackColor={{ false: "#767577", true: "#81b0ff" }}
               thumbColor={isDollar ? "#f4f3f4" : "#f4f3f4"}
@@ -368,6 +425,31 @@ const Manufacturer = ({ route, navigation }) => {
             />
           </View>
         </View>
+      </View>
+      <View className="">
+        {showSearch ? (
+          <Animated.View
+            entering={FadeInUp.delay(400).springify()}
+            className="w-90 px-4 py-4 flex-row justify-between items-center space-x-5"
+          >
+            <View className="flex-1">
+              <TextInput
+                value={searchQuery}
+                onChangeText={(text) => setSearchQuery(text)}
+                className="w-90 h-10 border border-slate-300 rounded-2xl bg-white px-4"
+                placeholder="search by name, price, product , availability"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={clearFilters}
+              className="bg-orange-500 h-10 w-10 rounded-full justify-center items-center"
+            >
+              <Icon.X size={20} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
+        ) : (
+          <View className="py-3"></View>
+        )}
       </View>
 
       <ScrollView
@@ -399,6 +481,7 @@ const Manufacturer = ({ route, navigation }) => {
         onBackdropPress={() => setModalVisible(false)}
         style={styles.modalContainer}
       >
+      
         <View
           className=""
           style={[styles.bottomSheetContainer1, { height: windowHeight * 0.8 }]}
@@ -419,7 +502,7 @@ const Manufacturer = ({ route, navigation }) => {
           <ScrollView vertical={true}>
             <View className="justify-center">
               <Text className="text-3xl font-bold text-slate-500 space-x-4 py-3">
-                {selected[1]}
+                {selected[0]}
               </Text>
 
               <Text
@@ -427,21 +510,22 @@ const Manufacturer = ({ route, navigation }) => {
                 className="text-xl text-bold"
               >
                 {isDollar
-                  ? "$ " + Number(selected[6] / selected[5]).toFixed(2)
-                  : "KES " + selected[6]}
+                  ? "$ " + Number(selected[5] / selected[4]).toFixed(2)
+                  : "KES " + selected[5]}
               </Text>
               <Text className="text-xl text-slate-600 font-semibold">
-                Manufacturer:{selected[0]}
+                Manufacturer:{selected[6]+" "+selected[7]}
               </Text>
               <Text className="text-xl text-slate-600 font-semibold">
-                Brand:{selected[2]}
+                Brand:{selected[1]}
               </Text>
               <Text className="text-xl text-slate-600 font-semibold">
-                SubCategory:{selected[3]}
+                Category:{selected[2]}
               </Text>
               <Text className="text-xl text-slate-600 font-semibold">
-                ExchangeRate:{selected[5]}
+                ExchangeRate:{selected[4]}
               </Text>
+              
             </View>
             <View className="py-2">
               <TouchableOpacity
