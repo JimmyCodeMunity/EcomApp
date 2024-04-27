@@ -31,9 +31,9 @@ const windowWidth = Dimensions.get("window").width;
 const CategoryScreen = ({ navigation,route }) => {
   const {categoryImage,categoryName} = route.params;
   const [tableHead, setTableHead] = useState([
-    "",
+    
     "Name",
-    "PartNo.",
+    "sku.",
     "Price",
     "Action",
   ]);

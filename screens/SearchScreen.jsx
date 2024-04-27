@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   SafeAreaView,
-  TextInput,
   Alert,
   Switch,
   TouchableOpacity,
@@ -13,6 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Linking,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { Table, TableWrapper, Row, Rows } from "react-native-table-component";
 import axios from "axios";
@@ -20,168 +21,248 @@ import * as Icon from "react-native-feather";
 import Modal from "react-native-modal";
 import { useCurrency } from "../components/CurrencyProvider";
 import { StatusBar } from "expo-status-bar";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import Loading from "../components/Loading";
+import { RefreshControl } from "react-native";
 
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
-const SearchScreen = () => {
+const SearchScreen = ({ navigation }) => {
   const [tableHead, setTableHead] = useState([
-    "",
     "Name",
-    "PartNo.",
+    "SKU.",
     "Price",
     "Action",
   ]);
   const [tableData, setTableData] = useState([]);
 
   const [selected, setSelected] = useState([]);
-  const [filteredProduct, setFilteredProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { isDollar, setIsDollar } = useCurrency();
-  const [categoryFilter, setCategoryFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterName, setFilterName] = useState("");
+  const [filterPrice, setFilterPrice] = useState("");
+  const [filterBrand, setFilterBrand] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [usdPrice, setUsdPrice] = useState("")
+
   const closeModal = () => {
     setModalVisible(false);
   };
 
-  const handleCall = () => {
-    const phoneNumber = selected[4];
-    const countryCode = "+254";
-
-    // Check if the phone number is valid
-    if (phoneNumber) {
-      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
-      // Construct the phone call URL
-      const phoneURL = `tel:${fullPhoneNumber}`;
-
-      // Open the phone app with the specified phone number
-      Linking.canOpenURL(phoneURL)
-        .then((supported) => {
-          if (!supported) {
-            console.error("Phone calls are not supported on this device");
-          } else {
-            return Linking.openURL(phoneURL);
-          }
-        })
-        .catch((error) => console.error(`Error opening phone app: ${error}`));
-    } else {
-      console.error("Phone number is not available");
-    }
+  const handleLinkClick = () => {
+    Linking.openURL(
+      "https://react-pdf-download-reseller.vercel.app/productlist"
+    );
   };
 
-  //handle whatsapp
-  const handleWhatsapp = () => {
-    const phoneNumber = selected[4];
-    const countryCode = "+254";
-    if (phoneNumber) {
-      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
-      const phoneURL = `tel:${fullPhoneNumber}`;
-      // Construct the WhatsApp chat URL
-      const whatsappURL = `https://wa.me/${fullPhoneNumber}`;
-
-      // Open the WhatsApp chat with the specified phone number
-      Linking.canOpenURL(whatsappURL)
-        .then((supported) => {
-          if (!supported) {
-            console.error("WhatsApp is not installed on this device");
-          } else {
-            return Linking.openURL(whatsappURL);
-          }
-        })
-        .catch((error) =>
-          console.error(`Error opening WhatsApp chat: ${error}`)
-        );
-    } else {
-      console.error("Phone number is not available");
-    }
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
   };
+
+
+
+
+
+
+  //handle refresh
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchData(); // Fetch the updated data
+    } catch (error) {
+      console.log(error);
+    }
+    setIsRefreshing(false);
+  };
+
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get(
+  //       "https://res-server-sigma.vercel.app/api/product/productlist"
+  //     );
+  //     const apiData = response.data;
+  //     setFilteredProducts(apiData);
+  //     setProducts(apiData);
+  //     setLoading(false);
+
+  //     if (apiData.length > 0) {
+  //       setTableHead(["Name", "supplier.", "Price", "Availability", "Action"]);
+
+  //       const rows = apiData.map((item, index) => [
+  //         item.name,
+  //         item.supplier,
+  //         item.price,
+  //         item.isAvailable,
+  //       ]);
+
+  //       //setTableData(rows);
+  //       //console.log("data",tableData)
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error.message);
+  //   }
+  // };
+
+  const [newdollar, setNewDollar] = useState()
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://opasso-app-backend.vercel.app/api/product/productlist"
+        "https://res-server-sigma.vercel.app/api/product/productlist"
       );
       const apiData = response.data;
       setFilteredProducts(apiData);
+      setProducts(apiData);
       setLoading(false);
 
       if (apiData.length > 0) {
-        setTableHead(["Name", "PartNo.", "Price", "Availability", "Action"]);
+        setTableHead(["Name", "sku.", "Price", "Availability", "Action"]);
 
-        const rows = apiData.map((item, index) => [
-          item.name,
-          item.partNumber,
-          item.discountPrice,
-          item.isAvailable,
-        ]);
+        const rows = await Promise.all(
+          apiData.map(async (item, index) => {
+            try {
+              // Fetch supplier details for each product
+              const supplierResponse = await axios.get(`https://res-server-sigma.vercel.app/api/shop/usersdata/${item.supplier}`);
+              const supplierData = supplierResponse.data.user;
+              const { firstName, lastName, dollarExchangeRate } = supplierData;
+              setNewDollar(dollarExchangeRate)
+              // console.log(`Supplier for ${item.name}: ${firstName} ${lastName}, Exchange: ${dollarExchangeRate} Price:${item.price}`);
 
-        //setTableData(rows);
-        //console.log("data",tableData)
+              // Calculate price in USD
+
+
+              return [
+                item.name,
+                `${firstName} ${lastName}`,
+                isDollar
+                  ? `$ ${Number(priceInUSD).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`
+                  : `KES ${Number(item.price).toLocaleString("en-US")}`,
+                item.isAvailable ? "Available" : "Unavailable",
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('viewproduct', {
+                    name: item.name,
+                    brand: item.brand,
+                    category: item.category,
+                    price: isDollar ? usdPrice : item.price,
+                    supplier: `${firstName} ${lastName}`,
+                    desc: item.description,
+                    categ: item.category,
+                    status: item.status,
+                  })}
+                  style={styles.viewDetailsButton}
+                >
+                  <Text style={styles.viewDetailsButtonText}>View</Text>
+                </TouchableOpacity>
+              ];
+            } catch (error) {
+              console.error("Error fetching supplier details:", error.message);
+              return [];
+            }
+          })
+        );
+
+        setTableData(rows.filter(row => row.length > 0));
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
   };
+
+
   const handleActionPress = ({ tableData }) => {
     console.log("rowData:", selected); // Log the entire rowData to inspect its structure
 
     Alert.alert("Selected Item", selected[1]);
   };
+
+  // Apply filters function
+  const applyFilter = () => {
+    setSearchQuery(filterName || filterPrice || filterBrand);
+  };
+
+  const initialPrice = 2000;
+
   //filter
-  const filteredProducts = filteredProduct.filter((filteredProduct) =>
-    filteredProduct.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const searchedProducts = products.filter(
+    (products) =>
+      products.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      products.price.toString().includes(searchQuery.toLowerCase()) ||
+      products.brand.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Function to clear filters
+  const clearFilters = () => {
+    setFilterBrand("");
+    setFilterPrice("");
+    setFilterName("");
+    setSearchQuery("");
+
+    setFilteredProducts(products); // Reset filteredProducts to all products
+  };
+
   const renderProductTable = () => {
-    const tableData = filteredProducts.map((item) => [
-      item.name,
-      item.partNumber,
-      isDollar
-        ? `$ ${Number(
-            (item.discountPrice / item.shop.exchangeRate).toFixed(2)
-          ).toLocaleString("en-US", {
+    const tableData = searchedProducts.map((item) => {
+      // Calculate price in USD
+      const priceInUSD = item.price / newdollar;
+      // Calculate price in KES
+      const priceInKES = item.price;
+
+
+      // console.log("dollars",newdollar)
+
+      return [
+        item.name,
+        item.sku,
+        isDollar
+          ? `$ ${Number(priceInUSD.toFixed(2)).toLocaleString("en-US", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`
-        : `KES ${Number(item.discountPrice.toFixed(2)).toLocaleString(
-            "en-US"
-          )}`,
-      item.isAvailable ? (
-        <Text className="text-center items-center">Available</Text>
-      ) : (
-        <Text className="text-center items-center">Unavailable</Text>
-      ),
+          : `KES ${Number(priceInKES.toFixed(2)).toLocaleString("en-US")}`,
+        item.isAvailable ? (
+          <Text className="text-center items-center">Available</Text>
+        ) : (
+          <Text className="text-center items-center">Unavailable</Text>
+        ),
 
-      <View className="justify-center items-center">
-        <TouchableOpacity
-          className="bg-orange-500 w-16 rounded-2xl h-8 justify-center items-center"
-          onPress={() => {
-            setSelected([
-              item.shop.name,
-              item.name,
-              item.brand,
-              item.category,
-              item.shop.phoneNumber,
-              item.shop.exchangeRate,
-              item.discountPrice,
-              item.isAvailable,
-            ]);
-            setModalVisible(true);
-          }}
-          style={styles.viewDetailsButton}
-        >
-          <Text style={styles.viewDetailsButtonText}>View</Text>
-        </TouchableOpacity>
-      </View>,
-    ]);
+        <View className="justify-center items-center">
+          <TouchableOpacity
+            className="bg-orange-500 w-16 rounded-2xl h-8 justify-center items-center"
+            onPress={() => {
+              navigation.navigate('viewproduct', {
+                name: item.name,
+                brand: item.brand,
+                category: item.category,
+                price: item.price,
+                supplier: item.supplier,
+                desc: item.description,
+                categ: item.category,
+                status: item.status,
+                dollarstate: isDollar
+              })
+            }}
+            style={styles.viewDetailsButton}
+          >
+            <Text style={styles.viewDetailsButtonText}>View</Text>
+          </TouchableOpacity>
+        </View>,
+      ];
+    });
 
     return (
       <Table borderStyle={{ borderWidth: 1 }}>
@@ -206,11 +287,63 @@ const SearchScreen = () => {
     );
   };
 
+
+
   return (
     <SafeAreaView className="flex-1" style={styles.container}>
-      <View className="px-4 mt-8">
-        <Text className="text-orange-400 font-bold text-3xl">Search</Text>
+      <View className="mt-8 py-3 px-4 flex-row justify-between items-center">
+        <View>
+          <Text className="text-orange-500 text-2xl font-bold">Search</Text>
+        </View>
+
+        <View>
+          {showSearch ? (
+            <TouchableOpacity
+              className="bg-orange-400 h-10 w-10 rounded-full justify-center items-center flex-1"
+              //  onPress={()=>navigation.navigate('pdfdownloadcategory',{catname:categoryName})}
+              onPress={toggleSearch}
+            >
+              <Icon.Search size={30} color="black" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              className=""
+              //  onPress={()=>navigation.navigate('pdfdownloadcategory',{catname:categoryName})}
+              onPress={toggleSearch}
+            >
+              <Icon.Search size={30} color="black" />
+            </TouchableOpacity>
+          )}
+        </View>
+
       </View>
+      <View className="">
+        {showSearch ? (
+          <Animated.View
+            entering={FadeInUp.delay(400).springify()}
+            className="w-90 px-4 py-4 flex-row justify-between items-center space-x-5"
+          >
+            <View className="flex-1">
+              <TextInput
+                value={searchQuery}
+                onChangeText={(text) => setSearchQuery(text)}
+                className="w-90 h-10 border border-slate-300 rounded-2xl bg-white px-4"
+                placeholder="search by name, price, product , availability"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={clearFilters}
+              className="bg-orange-500 h-10 w-10 rounded-full justify-center items-center"
+            >
+              <Icon.X size={20} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
+        ) : (
+          <View className="py-3"></View>
+        )}
+      </View>
+      
+      
       <View className="flex-row justify-between items-center px-5 py-5">
         <View>
           <Text className="text-xl text-slate-500 font-semibold flex-row justify-between item-center">
@@ -237,123 +370,57 @@ const SearchScreen = () => {
           </Text>
         </View>
 
-        <View>
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isDollar ? "#f4f3f4" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => setIsDollar((prevState) => !prevState)}
-            value={isDollar}
-          />
+        <View className="flex-row justify-between items-center space-x-3">
+          <View>
+            <TouchableOpacity
+              //   onPress={() =>
+              //     navigation.navigate("pdfdownloadall")
+              //   }
+              onPress={handleLinkClick}
+            >
+              <Icon.Download size={30} color="black" />
+            </TouchableOpacity>
+          </View>
+
+          <View>
+            <Switch
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={isDollar ? "#f4f3f4" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => setIsDollar((prevState) => !prevState)}
+              value={isDollar}
+            />
+          </View>
         </View>
       </View>
 
-      <View className="flex-row justify-between items-center">
-        <View className="w-full px-4 py-4">
-          <TextInput
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-            className="w-full h-10 border border-slate-300 rounded-2xl bg-white px-4"
-            placeholder="enter productname"
-          />
-        </View>
-      </View>
+
 
       <ScrollView
         horizontal={true}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 15 }}
       >
-        {loading ? (
-          <Loading/>
-        ) : (
-          <ScrollView vertical={true}>
-            <View>{renderProductTable()}</View>
-          </ScrollView>
-        )}
+        <ScrollView
+          vertical={true}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+          }
+        >
+          {loading ? (
+            <Loading />
+          ) : (
+            <Animated.View entering={FadeInDown.delay(400).springify()}>
+              {renderProductTable()}
+            </Animated.View>
+          )}
+        </ScrollView>
       </ScrollView>
 
       {/* <Modal animationType="slide" transparent={true} visible={modalVisible} className="justify-center items-center mt-12">
 
       </Modal> */}
 
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-        style={styles.modalContainer}
-      >
-        <View
-          className=""
-          style={[styles.bottomSheetContainer1, { height: windowHeight * 0.8 }]}
-        >
-          <View>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              className="bg-slate-400 justify-center items-center rounded-2xl h-12 w-12"
-            >
-              <Icon.XCircle size={30} color={"orange"} />
-            </TouchableOpacity>
-          </View>
-          <View className="justify-center items-center">
-            <Text className="text-slate-800 text-2xl font-semibold">
-              Product Details
-            </Text>
-          </View>
-          <ScrollView vertical={true}>
-            <View className="justify-center">
-              <Text className="text-3xl font-bold text-slate-500 space-x-4 py-3">
-                {selected[1]}
-              </Text>
-              {/* <Text style={{ fontSize: 24, fontWeight: 'bold' }} className="text-xl text-bold">
-              {isDollar
-                ? '$ ' + (Number(selected[6] / selected[5])).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : 'KES ' + selected[6].toLocaleString('en-US')}
-            </Text> */}
-              <Text
-                style={{ fontSize: 24, fontWeight: "bold" }}
-                className="text-xl text-bold"
-              >
-                {isDollar
-                  ? "$ " + Number(selected[6] / selected[5]).toFixed(2)
-                  : "KES " + selected[6]}
-              </Text>
-              <Text className="text-xl text-slate-600 font-semibold">
-                Manufacturer:{selected[0]}
-              </Text>
-              <Text className="text-xl text-slate-600 font-semibold">
-                Brand:{selected[2]}
-              </Text>
-              <Text className="text-xl text-slate-600 font-semibold">
-                SubCategory:{selected[3]}
-              </Text>
-              <Text className="text-xl text-slate-600 font-semibold">
-                ExchangeRate:{selected[5]}
-              </Text>
-            </View>
-            <View className="py-2">
-              <TouchableOpacity
-                onPress={handleWhatsapp}
-                className="rounded-2xl flex-row bg-green-500 p-2 w-90 h-12 justify-center items-center"
-              >
-                <Icon.MessageCircle size={23} color={"white"} />
-                <Text className="text-2xl font-semibold text-slate-700">
-                  Chat
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View className="py-2">
-              <TouchableOpacity
-                onPress={handleCall}
-                className="rounded-2xl flex-row p-2 bg-black w-90 h-12 justify-center items-center"
-              >
-                <Icon.Phone size={23} color={"white"} />
-                <Text className="text-2xl font-semibold text-slate-200">
-                  Call
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
-      </Modal>
+
     </SafeAreaView>
   );
 };

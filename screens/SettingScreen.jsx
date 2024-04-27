@@ -71,7 +71,7 @@ const GeneralSettings = ({ navigation, route }) => {
     Linking.openURL("https://resellersprint.com");
   }
   const becomeSupplier = () =>{
-    Linking.openURL("https://resellersprint.com/shop-create");
+    Linking.openURL("https://resellersprint.com/supplier-register");
   }
   const privacyPolicy = () =>{
     // Linking.openURL("https://docs.google.com/document/d/1AAUMvcyYzh1Qn656M_LlZxtvz_fLf6sUyWlIYDI1Vcc/edit?usp=sharing");

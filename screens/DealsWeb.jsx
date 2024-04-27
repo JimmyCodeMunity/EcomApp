@@ -8,6 +8,7 @@ const DealsWeb = ({route}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const {link} = route.params;
+  console.log(link)
 
   useEffect(() => {
     checkInternetConnection();
