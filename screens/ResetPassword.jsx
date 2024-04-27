@@ -47,7 +47,7 @@ const ResetPassword = ({ navigation, route }) => {
   }, []);
 
   const getUserdata = () => {
-    fetch('https://opasso-app-backend.vercel.app/api/user/usersdata')
+    fetch('https://res-server-sigma.vercel.app/api/user/usersdata')
       .then((response) => response.json())
       .then((data) => {
         const user = data.find((item) => item.email === email);
@@ -66,7 +66,7 @@ const ResetPassword = ({ navigation, route }) => {
       alert("password do not match")
     } else {
       try {
-        const response = await axios.put(`https://opasso-app-backend.vercel.app/api/user/updatepassword/${email}`, {
+        const response = await axios.put(`https://res-server-sigma.vercel.app/api/user/updatepassword/${email}`, {
           password: password
         });
         setUserdata(response.data);
