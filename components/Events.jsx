@@ -22,7 +22,7 @@ const Events = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const event = await axios.get('https://opasso-app-backend.vercel.app/api/event/allevents');
+                const event = await axios.get('https://res-server-sigma.vercel.app/api/ads/allads');
                 setEvents(event.data);
                 //console.log('Events:', eventsData.length);
             } catch (error) {
@@ -34,15 +34,10 @@ const Events = () => {
     }, []);
 
     const eventsData = events.map((event) => ({
-        title: event.name, // Add title to data for rendering in the carousel
-        imageUri: event.images[0],
-        link: event.shop,
-        description: event.event_description,
-        p_description:event.description,
-        original: event.originalPrice,
-        discount: event.discountPrice,
-        seller:event.shop.name,
-        phone:event.shop.phoneNumber,
+        title: event.title,
+        description: event.description,
+        supplier:event.supplier,
+        
     }));
 
     const renderCarouselItem = ({ item }) => {
@@ -106,25 +101,22 @@ const ProductCard = ({ item }) => {
     return (
         <TouchableWithoutFeedback onPress={()=>navigation.navigate('eventdata',{
             itemName:item.title,
-            itemDescription:item.p_description,
-            itemOriginal:item.original,
-            itemDiscount:item.discount,
-            itemSeller:item.seller,
-            itemPhone:item.phone
+            supplier:item.supplier,
+            itemDescription:item.description,
+            
         })}>
-            <View className="h-40 w-full rounded-3xl shadow-sm bg-gray-300">
+            <View className="h-40 w-full rounded-3xl shadow-sm bg-black justify-center">
                 <View className="flex-row justify-between items-center">
                     <View className="px-3 p-3" style={{ width: '50%' }}>
-                        <Text className="text-lg font-semibold" style={{ color: item.textcolor }}>{item.title}</Text>
-                        <Text className="text-2xl font-bold">{item.description}</Text>
+                        <Text className="text-2xl font-semibold text-white ">{item.title}</Text>
+                        <Text className="text-normal text-slate-500 font-semibold">{item.description.length > 20 ? item.description.slice(0, 20) + '...' : item.description}</Text>
                         <View className="py-3">
-                            <Text className="font-semibold text-orange-500 my-1" style={{ textDecorationLine: "line-through" }}>Kshs.{item.original}</Text>
-                            <Text className="text-slate-900 font-semibold text-lg">Kshs.{item.discount}</Text>
+                            
                         </View>
                     </View>
                     <View className="justify-center items-center" style={{ width: '30%', zIndex: -2 }}>
                         <Image source={require('../assets/user.jpeg')} className="h-16 w-16 my-1 rounded-full"/>
-                        <Text className="font-semibold">{item.seller}</Text>
+                        
                         
                     </View>
                 </View>

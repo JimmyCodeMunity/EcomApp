@@ -238,7 +238,7 @@ const FirstScreen = ({ navigation, route }) => {
         <View style={{ justifyContent: "center", alignItems: "center" }}>
 
 
-          <Deals />
+          
 
 
 
